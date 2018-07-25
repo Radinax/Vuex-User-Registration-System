@@ -1,9 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { MdField } from 'vue-material/dist/components'
-import 'vue-material/dist/vue-material.min.css'
+import createPersistedState from "vuex-persistedstate";
 
-Vue.use(MdField)
 Vue.use(Vuex)
 
 export const store = new Vuex.Store({
@@ -16,15 +14,34 @@ export const store = new Vuex.Store({
             idType: '',
             idNumber: '',
             bloodType: '',
-            phoneType: '',
-            countryCode: '',
+            phoneType: 'Celular',
+            countryCode: '+58',
             phoneNumber: '',
             email: ''
         },
         user: []
     },
+    plugins: [createPersistedState()],
     getters: {
-        
+        genderActive: function(state) { 
+            return {
+                male: state.newUser.gender == 'male',
+                female: state.newUser.gender == 'female'
+            } 
+        },
+        bloodActive: function(state) { 
+            return {
+                Op: state.newUser.bloodType == 'O+',
+                On: state.newUser.bloodType == 'O-',
+                Ap: state.newUser.bloodType == 'A+',
+                An: state.newUser.bloodType == 'A-',
+                Bp: state.newUser.bloodType == 'B+',
+                Bn: state.newUser.bloodType == 'B-',
+                ABp: state.newUser.bloodType == 'AB+',
+                ABn: state.newUser.bloodType == 'AB-',
+                Unknown: state.newUser.bloodType == 'Desconocido',
+            } 
+        }
     },
     mutations: {
         updateFirstName (state, firstName) {
@@ -41,9 +58,6 @@ export const store = new Vuex.Store({
         },
         updateIdNumber (state, idNumber) {
             state.newUser.idNumber = idNumber
-        },
-        updateBloodType (state, bloodType) {
-            state.newUser.bloodType = bloodType
         },
         updatePhoneType (state, phoneType) {
             state.newUser.phoneType = phoneType
@@ -72,11 +86,25 @@ export const store = new Vuex.Store({
             })
             state.newUser = {}
             e.preventDefault();
+        },
+        addGender (state, e) {
+            state.newUser.gender = e.path[0].value;
+            e.preventDefault();
+        },
+        addBloodType (state, e) {
+            state.newUser.bloodType = e.path[0].value;
+            e.preventDefault();
         }
     },
     actions: {
         addUser: function(context,e) {
             context.commit('addUser',e)
+        },
+        addGender: function(context, e) {
+            context.commit('addGender', e)
+        },
+        addBloodType: function(context, e) {
+            context.commit('addBloodType', e)
         }
     }
 })
